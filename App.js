@@ -1,26 +1,49 @@
-import React, { useEffect, useState } from 'react';
-import { Pressable, Dimensions, StyleSheet, Text, View } from 'react-native';
+import React, { Component } from 'react';
+import { Pressable, Dimensions, StyleSheet, Text, View, StatusBar } from 'react-native';
 import { GameEngine, dispatch } from "react-native-game-engine";
-import Cube from './components/Cube';
+import Box from './components/Box';
 import Matter from "matter-js";
-import Constants from './components/Constants';
-import { GameLoop } from "./systems";
+
+const Physics = (entities, { time }) => {
+  let engine = entities["physics"].engine;
+	Matter.Engine.update(engine, time.delta);
+	
+  return entities;
+};
 
 export default class App extends Component {
 
   constructor(props) {
     super(props);
 
-    this.boardSize = Constants.GRID_SIZE * Constants.CELL_SIZE;
     this.engine = null;
-    this.cubeLeft = Constants.MAX_WIDTH / 2;
-    this.gravity = 3;
-    this.gameTimerId;
+    this.maxWidth = Dimensions.get("screen").width;
+    this.maxHeight = Dimensions.get("screen").width;
+
+
+    this.boxSize = 50; //Math.trunc(Math.max(Constants.MAX_WIDTH, Constants.MAX_HEIGHT) * 0.075);
+    this.floorHeight = 5;
 
     this.state = {
       running: true,
-      cubeBottom: Constants.MAX_HEIGHT / 2,
     }
+
+    this.entities = this.setupWorld();
+  }
+
+  setupWorld = () => {
+    let engine = Matter.Engine.create({ enableSleeping: false });
+    let world = engine.world;
+    let box = Matter.Bodies.rectangle(this.maxWidth / 2, this.maxHeight / 2, this.boxSize, this.boxSize);
+    let floor = Matter.Bodies.rectangle(this.maxWidth / 2, this.maxHeight - this.floorHeight, this.maxWidth, this.floorHeight, { isStatic: true })
+    
+    Matter.World.add(world, [box, floor]);
+    
+    return {
+      physics: { engine: engine, world: world },
+      box: { body: box, size: [this.boxSize, this.boxSize], color: 'black', renderer: Box},
+      floor: { body: floor, size: [this.maxWidth, this.floorHeight], color: 'green', renderer: Box},
+    } 
   }
 
   onEvent = (e) => {
@@ -34,49 +57,23 @@ export default class App extends Component {
   
   render() {
     return (
-        <View style={styles.container}>
-            <GameEngine
-                ref={(ref) => { this.engine = ref; }}
-                style={[{ width: this.boardSize, height: this.boardSize, backgroundColor: '#ffffff', flex: null }]}
-                systems={[ GameLoop ]}
-                entities={{
-                    head: { position: [0,  0], xspeed: 1, yspeed: 0, nextMove: 10, updateFrequency: 10, size: 20, renderer: <Head />},
-                    food: { position: [this.randomBetween(0, Constants.GRID_SIZE - 1), this.randomBetween(0, Constants.GRID_SIZE - 1)], size: 20, renderer: <Food />},
-                    tail: { size: 20, elements: [], renderer: <Tail /> }
-                }}
-                running={this.state.running}
-                onEvent={this.onEvent}>
-
-                <StatusBar hidden={true} />
-
-            </GameEngine>
-
-            <Button title="New Game" onPress={this.reset} />
-
-            <View style={styles.controls}>
-                <View style={styles.controlRow}>
-                    <TouchableOpacity onPress={() => { this.engine.dispatch({ type: "move-up" })} }>
-                        <View style={styles.control} />
-                    </TouchableOpacity>
-                </View>
-                <View style={styles.controlRow}>
-                    <TouchableOpacity onPress={() => { this.engine.dispatch({ type: "move-left" })} }>
-                        <View style={styles.control} />
-                    </TouchableOpacity>
-                    <View style={[styles.control, { backgroundColor: null}]} />
-                    <TouchableOpacity onPress={() => { this.engine.dispatch({ type: "move-right" })}}>
-                        <View style={styles.control} />
-                    </TouchableOpacity>
-                </View>
-                <View style={styles.controlRow}>
-                    <TouchableOpacity onPress={() => { this.engine.dispatch({ type: "move-down" })} }>
-                        <View style={styles.control} />
-                    </TouchableOpacity>
-                </View>
-            </View>
-        </View>
-    );
+      <GameEngine 
+        style={styles.container}
+        systems={[Physics]} 
+        entities={this.entities}>
+         <StatusBar hidden={true} />
+      </GameEngine>
+  );
+  }
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+});
+
 /*
   useEffect(() => {
       if (cubeBottom > 0 && pressedButton == true) {
@@ -91,13 +88,4 @@ export default class App extends Component {
   }, [cubeBottom])
 */
 
-}
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
