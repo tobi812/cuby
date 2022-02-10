@@ -15,12 +15,13 @@ export default class Box extends Component {
                 height: height,
                 backgroundColor: this.props.color,
                 left: x,
-                top: y
+                top: y,
+                borderRadius: 2,
             },
         }); 
 
         return (
-            <View style={styles.box}></View>
+            <View style={styles.box}/>
         )
     }
 }
