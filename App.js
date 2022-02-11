@@ -5,6 +5,7 @@ import Box from './components/Box';
 import Matter from "matter-js";
 import Constants from "./Constants";
 import BoxMovement from "./components/BoxMovement";
+import GameBoard from "./components/GameBoard";
 
 const Physics = (entities, { time }) => {
   let engine = entities["physics"].engine;
@@ -68,16 +69,10 @@ export default class App extends Component {
     engine.gravity.y = 0
     Matter.World.add(world, [box, floor, leftWall, rightWall, roof]);
     
-    return {
+    let entities = {
       physics: {
         engine: engine,
         world: world
-      },
-      box: {
-        body: box,
-        size: [this.boxSize, this.boxSize],
-        color: "black",
-        renderer: Box
       },
       floor: {
         body: floor,
@@ -103,7 +98,11 @@ export default class App extends Component {
         color: "white",
         renderer: Box
       }
-    } 
+    }
+
+    entities = GameBoard({entities})
+
+    return entities
   }
   
   createBox = (entities, {touches, screen}) => {
@@ -151,7 +150,7 @@ export default class App extends Component {
 
   render() {
     return (
-      <GameEngine 
+      <GameEngine
         style={styles.container}
         systems={[Physics, BoxMovement]}
         entities={this.entities}>

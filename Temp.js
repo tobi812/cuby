@@ -20,3 +20,35 @@
                 </TouchableOpacity>
             </View>
         </View>
+
+
+            // render() {
+            //     const styles = StyleSheet.create({
+            //         gameBoard: {
+            //             width: Constants.maxWidth,
+            //             height: Constants.maxWidth,
+            //             display: 'flex',
+            //             flexWrap: 'wrap',
+            //         },
+            //         field: {
+            //             width: (Constants.maxWidth - 10) / this.columnCount,
+            //             height: (Constants.maxWidth - 10) / this.columnCount,
+            //         }
+            //     });
+            //
+            //     return (
+            //         <View style={styles.gameBoard}>
+            //             {this.state.fields.map((fieldColor, index) => (
+            //                 <Box key={index} style={{
+            //                     backgroundColor: fieldColor,
+            //                     width: ((Constants.maxWidth) / this.columnCount) - 4,
+            //                     height: ((Constants.maxWidth) / this.columnCount) - 4,
+            //                     margin: 2,
+            //                     borderRadius: 4,
+            //                 }}>
+            //                 </Box>
+            //                 )
+            //             )}
+            //         </View>
+            //     )
+            // }

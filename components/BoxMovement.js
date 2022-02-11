@@ -1,5 +1,7 @@
 import Matter from "matter-js";
 import Constants from "../Constants";
+import GameBoard from "./GameBoard";
+import App from "../App";
 
 const BoxMovement = (entities, {touches, screen, layout, time}) => {
     let move = touches.find(x => x.type === "move");
@@ -7,7 +9,25 @@ const BoxMovement = (entities, {touches, screen, layout, time}) => {
     let maxHeight = Constants.maxHeight;
 
     if (move) {
-        let box = entities["box"];
+
+        let x = move.event.pageX
+        let y = move.event.pageY
+        let boxNumber = Math.floor((y - Constants.boardPositionX) / (Constants.boxMargin + Constants.boxSize)) * Constants.columnCount + Math.floor((x - Constants.boardPositionX) / (Constants.boxMargin + Constants.boxSize))
+        console.log(x)
+        console.log(y)
+        console.log(Constants.boxMargin + Constants.boxSize)
+        console.log(Math.floor((y - Constants.boardPositionX) / (Constants.boxMargin + Constants.boxSize)) * Constants.columnCount)
+        console.log( Math.floor((x - Constants.boardPositionX) / (Constants.boxMargin + Constants.boxSize)))
+        console.log("Boxnumber:" + boxNumber)
+        if (!boxNumber) {
+            return entities;
+        }
+        let box = entities["box_" + boxNumber];
+        if (box) {
+            return entities;
+        }
+
+        console.log(boxNumber)
         if (
             move.event.pageX >= (box.body.position.x - 25) &&
             move.event.pageX <= (box.body.position.x + 25) &&

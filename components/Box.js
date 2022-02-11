@@ -5,6 +5,7 @@ export default class Box extends Component {
     render() {
         const width = this.props.size[0];
         const height = this.props.size[1];
+        const margin = 'margin' in this.props ? this.props.margin : 0;
         const x = this.props.body.position.x - width / 2;
         const y = this.props.body.position.y - height / 2;  
         
@@ -13,6 +14,7 @@ export default class Box extends Component {
                 position: "absolute",
                 width: width,
                 height: height,
+                margin: margin,
                 backgroundColor: this.props.color,
                 left: x,
                 top: y,
