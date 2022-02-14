@@ -100,7 +100,7 @@ export default class App extends Component {
       },
       round: {
         number: 0,
-        direction: null
+        selectedBoxId: null
       }
     }
 

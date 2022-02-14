@@ -22,14 +22,23 @@ const GameBoard = ({entities}) => {
         let randomType = fieldTypes[Math.floor(Math.random() * fieldTypes.length)];
         let box = Matter.Bodies.rectangle(x, y, boxSize, boxSize);
 
-        if (randomType == 'empty') {
+        if (randomType === 'empty') {
             continue
         }
 
-        entities['box_' + (i % columnCount) + '_' + Math.floor(i / columnCount)] = {
+        let column = Math.floor(i / columnCount)
+        let row = i % columnCount
+
+        let boxId = 'box_' + i
+        entities[boxId] = {
+            boxId: boxId,
             body: box,
             size: [boxSize, boxSize],
             color: randomType,
+            velocityX: 0,
+            velocityY: 0,
+            distanceX: boxSize + boxMargin,
+            distanceY: boxSize + boxMargin,
             renderer: Box
         }
     }
@@ -38,7 +47,3 @@ const GameBoard = ({entities}) => {
 }
 
 export default GameBoard
-
-//(x - boardPositionX) / (boxSize + boxMargin)
-
-//Math.floor((y - boardPositionY) / (boxSize + boxMargin))

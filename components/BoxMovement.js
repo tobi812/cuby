@@ -5,6 +5,28 @@ import App from "../App";
 
 const BoxMovement = (entities, {touches, dispatch, screen, layout, time}) => {
 
+    const getColumnNeighbor = (box, entities, move) => {
+        let factor = 1
+        if (move.delta.pageX < 0) {
+            factor = -1
+        }
+
+        let newPositionX = box.body.position.x + (box.size[0] + Constants.boxMargin) * Math.sign(move.delta.pageX)
+
+        return findBox(newPositionX, box.body.position.y, entities)
+    }
+
+    const getRowNeighbor = (box, entities, move) => {
+        let factor = 1
+        if (move.delta.pageY < 0) {
+            factor = -1
+        }
+
+        let newPositionY = box.body.position.y + (box.size[1] + Constants.boxMargin) * Math.sign(move.delta.pageY)
+
+        return findBox(box.body.position.y, newPositionY, entities)
+    }
+
     const findBox = (x, y, entities) => {
         let box = Object.values(entities).find(entity => {
             if (entity.body === undefined) {
@@ -12,7 +34,7 @@ const BoxMovement = (entities, {touches, dispatch, screen, layout, time}) => {
             }
 
             let entityX = entity.body.position.x
-            let entityY = entity.body.position.x
+            let entityY = entity.body.position.y
             let halfWidth = (entity.size[0] / 2)
             let halfHeight = (entity.size[1] / 2)
             
@@ -33,31 +55,51 @@ const BoxMovement = (entities, {touches, dispatch, screen, layout, time}) => {
         let maxWidth = Constants.maxWidth;
         let maxHeight = Constants.maxHeight;
 
-        let box = findBox(x, y, entities)
-        if (box === undefined) {
-            return entities
+        let box = null
+        let direction = null
+        if (entities.round.boxId) {
+            box = entities[entities.round.boxId]
+            direction = box.velocityX ? 'x' : null
+            direction = box.velocityY ? 'y' : direction
+        } else {
+            box = findBox(x, y, entities)
+            direction = Math.abs(deltaX) > Math.abs(deltaY) ? 'x' : 'y'
+            if (box === undefined) {
+                return entities
+            }
+            entities.round.selectedBoxId = box.boxId
         }
 
-        let direction = entities.round.direction
-        if (direction === null) {
-            direction = Math.abs(deltaX) > Math.abs(deltaY) ? 'x' : 'y'
-            entities.round.direction = direction
-        }
-        
+        box.color = 'green'
+
         if (direction === 'x') {
-            // Check if maxWidth is reached and for collision with other box.
-            box.body.position.x = box.body.position.x + deltaX
+            let columnNeighbor = getColumnNeighbor(box, entities, move)
+            if (!columnNeighbor) {
+                box.velocityX = 2 * Math.sign(deltaX)
+            } else {
+                columnNeighbor.color = 'red'
+            }
         }
 
         if (direction === 'y') {
             // Check if maxHeight is reached and for collision with other box.
-            box.body.position.y = box.body.position.y + deltaY
+            let rowNeighbor = getRowNeighbor(box, entities, move)
+            if (!getRowNeighbor(box, entities, move)) {
+                box.velocityY = 2 * Math.sign(deltaY)
+            } else {
+                rowNeighbor.color = 'orange'
+            }
         }
 
         return entities
     }
     
-    const endMove = () => {
+    const endMove = (entities, touch) => {
+        let x = touch.event.pageX
+        let y = touch.event.pageY
+
+        // let box = findBox(x, y, entities)
+        // box.color = 'black'
         // Dispatch end-round event and if box has changed position.
     }
     
@@ -68,95 +110,48 @@ const BoxMovement = (entities, {touches, dispatch, screen, layout, time}) => {
         }
 
         if (touch.type === 'end') {
-            endMove()
+            endMove(entities, touch)
         }
     });
-/*
 
-    //let move = touches.find(x => x.type === "start")
-    //if (move === undefined) {
-    //    return entities
-    //}
-    
-
-    
-    if (move) {
-        let x = move.event.pageX
-        let y = move.event.pageY
-        let box = Object.values(entities).find(entity => 
-             entity.body.position.x - (entity.size[0] / 2) <= x &&
-                x <= entity.body.position.x + (entity.size[0] / 2) &&
-                entity.body.position.y - (entity.size[1] / 2) <= y &&
-                y <= entity.body.position.y + (entity.size[1] / 2)
-        )
-
-        box.body.position.x = box.body.position.x + move.delta.pageX
-        box.body.position.y = box.body.position.y + move.delta.pageY;
-        
+    let box = entities[entities.round.selectedBoxId]
+    if (box === undefined || box === null) {
         return entities
-        
-        let columnNumber = Math.floor((x - Constants.boardPositionX) / (Constants.boxMargin + Constants.boxSize))
-        let rowNumber = Math.floor((y - Constants.boardPositionX) / (Constants.boxMargin + Constants.boxSize))
-
-
-        let boxId = 'box_' + columnNumber + '_' + rowNumber
-
-        if (
-            (box.body.position.x + move.delta.pageX) <= maxWidth &&
-            (box.body.position.x + move.delta.pageX) >= 0 &&
-            Math.abs(move.delta.pageX) > Math.abs(move.delta.pageY)
-        ) {
-            box.body.position.x = box.body.position.x + move.delta.pageX
-            
-            if (move.delta.pageX > 0) {
-                if (!entities['box_' + (columnNumber + 1) + '_' + rowNumber]) {
-                    entities['box_' + (columnNumber + 1) + '_' + rowNumber] = box
-                    delete entities[boxId]
-                    //box.body.position.x = box.body.position.x + Constants.boxSize + Constants.boxMargin;
-                    box.body.position.x = box.body.position.x + move.delta.pageX
-                }
-            }
-            
-            
-
-            //if (move.delta.pageX < 0) {
-            //    Matter.Body.applyForce( box.body, box.body.position, {x: -0.10, y: 0.00});
-            //}
-            //if (move.delta.pageX > 0) {
-            //    Matter.Body.applyForce( box.body, box.body.position, {x: 0.10, y: 0.00});
-            //}
-        }
-        
-        if (
-            (box.body.position.y + move.delta.pageY) <= maxHeight &&
-            (box.body.position.y + move.delta.pageY) >= 0 &&
-            Math.abs(move.delta.pageX) < Math.abs(move.delta.pageY)
-        ) {
-            box.body.position.y = box.body.position.y + move.delta.pageY;
-
-            if (move.delta.pageY > 0) {
-                if (!entities['box_' + columnNumber + '_' + (rowNumber + 1)]) {
-                    entities['box_' + columnNumber + '_' + (rowNumber + 1)] = box
-                    delete entities[boxId]
-                    //box.body.position.y = box.body.position.y + Constants.boxSize + Constants.boxMargin;
-
-                    box.body.position.y = box.body.position.y + move.delta.pageY;
-                }
-            }
-            //if (move.delta.pageY > 0) {
-            //    Matter.Body.applyForce( box.body, box.body.position, {x: 0.00, y: 0.10});
-            //}
-
-            //if (move.delta.pageY < 0) {
-            //    Matter.Body.applyForce( box.body, box.body.position, {x: 0.00, y: -0.10});
-            //}
-        }
-
     }
 
-            */
+    if (box.velocityX !== 0) {
+        let velocityX = box.velocityX
+        box.distanceX = box.distanceX - Math.abs(box.velocityX)
+        if (box.distanceX < 0) {
+            velocityX = velocityX + box.distanceX * Math.sign(velocityX)
+        }
+        box.body.position.x = box.body.position.x + velocityX
+    }
 
-    return entities;
+    if (box.velocityY !== 0) {
+        let velocityY = box.velocityY
+        box.distanceY = box.distanceY - Math.abs(box.velocityY)
+        if (box.distanceY < 0) {
+            velocityY = velocityY + box.distanceY * Math.sign(velocityY)
+        }
+        box.body.position.y = box.body.position.y + velocityY
+    }
+
+    if (box.distanceX <= 0) {
+        box.distanceX = box.size[0] + Constants.boxMargin
+        box.velocityX = 0
+        box.color = 'black'
+        entities.round.direction = null
+    }
+
+    if (box.distanceY <= 0) {
+        box.distanceY = box.size[1] + Constants.boxMargin
+        box.velocityY = 0
+        box.color = 'black'
+        entities.round.direction = null
+    }
+
+    return entities
 }
 
 export default BoxMovement
