@@ -13,15 +13,20 @@ const GameBoard = ({entities}) => {
 
     const fieldTypes = [
         'black',
-        'transparent',
+        'empty',
     ];
+   
     for (let i = 0; i < totalFields; i++) {
         let x = boardPositionX + (i % columnCount) * (boxSize + boxMargin);
         let y = boardPositionY + Math.floor(i / columnCount) * (boxSize + boxMargin)
         let randomType = fieldTypes[Math.floor(Math.random() * fieldTypes.length)];
         let box = Matter.Bodies.rectangle(x, y, boxSize, boxSize);
 
-        entities['box_' + i] = {
+        if (randomType == 'empty') {
+            continue
+        }
+
+        entities['box_' + (i % columnCount) + '_' + Math.floor(i / columnCount)] = {
             body: box,
             size: [boxSize, boxSize],
             color: randomType,

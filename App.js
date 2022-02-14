@@ -8,7 +8,7 @@ import BoxMovement from "./components/BoxMovement";
 import GameBoard from "./components/GameBoard";
 
 const Physics = (entities, { time }) => {
-  let engine = entities["physics"].engine;
+  let engine = entities['physics'].engine;
   Matter.Engine.update(engine, time.delta);
 
 /*  touches.filter(t => t.type === "press").forEach(t => {
@@ -97,6 +97,10 @@ export default class App extends Component {
         size: [this.maxWidth, 1],
         color: "white",
         renderer: Box
+      },
+      round: {
+        number: 0,
+        direction: null
       }
     }
 
