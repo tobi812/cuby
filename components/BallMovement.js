@@ -36,7 +36,7 @@ const BallMovement = (entities, {touches, dispatch, screen, layout, time}) => {
 
     activeBallIds.forEach(ballId => {
         let ball = entities[ballId]
-        let rowNeighbor = getRowNeighbor(ball, entities, 20)
+        let rowNeighbor = getRowNeighbor(ball, entities, 0)
         if (rowNeighbor === undefined && ball.body.isStatic === true) {
             ball.velocityY = 3
         } else {
@@ -44,16 +44,15 @@ const BallMovement = (entities, {touches, dispatch, screen, layout, time}) => {
         }
 
         if (ball.body.position.y > Constants.maxHeight - 180 && ball.body.isStatic === true) {
-            let newBallY = ball.body.position.y
             let newBallX = ball.body.position.x
+            let newBallY = ball.body.position.y
             let radius = (Constants.boxSize - Constants.boxMargin) / 2
             Matter.World.remove(entities.physics.world, ball.body)
-            let newBall = Matter.Bodies.circle(newBallX, newBallY, radius)
+            let newBall = Matter.Bodies.circle(newBallX, newBallY, radius, {friction: 1})
             Matter.World.add(entities.physics.world, newBall);
             entities[ballId] = {
                 body: newBall,
                 radius: radius,
-                size: [radius, radius],
                 color: 'red',
                 renderer: Ball
             }

@@ -1,7 +1,6 @@
 import Matter from "matter-js";
 import Constants from "../Constants";
 import GameBoard from "./GameBoard";
-import App from "../App";
 
 const BoxMovement = (entities, {touches, dispatch, screen, layout, time}) => {
     const nextMove = (entities) => {
@@ -82,7 +81,7 @@ const BoxMovement = (entities, {touches, dispatch, screen, layout, time}) => {
         if (direction === 'x' && box.velocityX === 0) {
             let columnNeighbor = getColumnNeighbor(box, entities, move)
             if (!columnNeighbor) {
-                box.velocityX = 3 * Math.sign(deltaX)
+                box.velocityX = 10 * Math.sign(deltaX)
             } else {
                 columnNeighbor.color = 'red'
             }
@@ -92,7 +91,7 @@ const BoxMovement = (entities, {touches, dispatch, screen, layout, time}) => {
             // Check if maxHeight is reached and for collision with other box.
             let rowNeighbor = getRowNeighbor(box, entities, move)
             if (!getRowNeighbor(box, entities, move)) {
-                box.velocityY = 3 * Math.sign(deltaY)
+                box.velocityY = 10 * Math.sign(deltaY)
             } else {
                 rowNeighbor.color = 'orange'
             }

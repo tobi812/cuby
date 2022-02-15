@@ -8,7 +8,7 @@ const newRound = (entities) => {
     round.number = round.number + 1
     round.moves = 0
 
-    let newBallX = 5 + (Constants.boxSize + Constants.boxMargin) * Math.floor(Math.random() * Constants.columnCount)
+    let newBallX = Constants.boxMargin + 5 + (Constants.boxSize + Constants.boxMargin) * Math.floor(Math.random() * Constants.columnCount) + radius
     let newBallY = Constants.boardPositionY - 2 * (Constants.boxSize + Constants.boxMargin)
     let newBall = Matter.Bodies.circle(newBallX, newBallY, radius, { isStatic: true })
     Matter.World.add(entities.physics.world, newBall);
