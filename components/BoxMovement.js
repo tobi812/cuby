@@ -4,43 +4,35 @@ import GameBoard from "./GameBoard";
 import App from "../App";
 
 const BoxMovement = (entities, {touches, dispatch, screen, layout, time}) => {
-
-    const nextRound = (entities) => {
-        let selectedBox = entities[entities.round.selectedBoxId]
+    const nextMove = (entities) => {
+        let selectedBox = entities[entities.gamebar.round.selectedBoxId]
         selectedBox.velocityX = 0
         selectedBox.velocityY = 0
         selectedBox.distanceX = selectedBox.size[0] + Constants.boxMargin
         selectedBox.distanceY = selectedBox.size[1] + Constants.boxMargin
         selectedBox.color = 'black'
 
-        entities.round.number = entities.round.number + 1
-        entities.round.selectedBoxId = null
+        entities.gamebar.round.moves = entities.gamebar.round.moves + 1
+        entities.gamebar.round.selectedBoxId = null
 
         Object.values(entities).forEach(entity => {
-            if (entity.color !== undefined) {
+            if (entity.boxId !== undefined) {
                 entity.color = 'black'
             }
         })
 
+        if (entities.gamebar.round.moves >= Constants.movesPerRound) {
+            dispatch('new-round')
+        }
     } 
     
     const getColumnNeighbor = (box, entities, move) => {
-        let factor = 1
-        if (move.delta.pageX < 0) {
-            factor = -1
-        }
-
         let newPositionX = box.body.position.x + (box.size[0] / 2 + Constants.boxMargin) * Math.sign(move.delta.pageX)
 
         return findBox(newPositionX, box.body.position.y, entities)
     }
 
     const getRowNeighbor = (box, entities, move) => {
-        let factor = 1
-        if (move.delta.pageY < 0) {
-            factor = -1
-        }
-
         let newPositionY = box.body.position.y + (box.size[1] / 2 + Constants.boxMargin) * Math.sign(move.delta.pageY)
 
         return findBox(box.body.position.x, newPositionY, entities)
@@ -48,7 +40,7 @@ const BoxMovement = (entities, {touches, dispatch, screen, layout, time}) => {
 
     const findBox = (x, y, entities) => {
         let box = Object.values(entities).find(entity => {
-            if (entity.body === undefined) {
+            if (entity.boxId === undefined) {
                 return false
             }
 
@@ -67,17 +59,13 @@ const BoxMovement = (entities, {touches, dispatch, screen, layout, time}) => {
     const moveBox = (entities, move) => {
         let x = move.event.pageX
         let y = move.event.pageY
-
         let deltaX = move.delta.pageX
         let deltaY = move.delta.pageY
-        
-        let maxWidth = Constants.maxWidth;
-        let maxHeight = Constants.maxHeight;
-
         let box = null
         let direction = null
-        if (entities.round.selectedBoxId) {
-            box = entities[entities.round.selectedBoxId]
+
+        if (entities.gamebar.round.selectedBoxId) {
+            box = entities[entities.gamebar.round.selectedBoxId]
             direction = box.velocityX ? 'x' : null
             direction = box.velocityY ? 'y' : direction
         } else {
@@ -86,8 +74,8 @@ const BoxMovement = (entities, {touches, dispatch, screen, layout, time}) => {
             if (box === undefined) {
                 return entities
             }
-            
-            entities.round.selectedBoxId = box.boxId
+
+            entities.gamebar.round.selectedBoxId = box.boxId
             box.color = 'green'
         }
     
@@ -133,14 +121,14 @@ const BoxMovement = (entities, {touches, dispatch, screen, layout, time}) => {
         }
     });
 
-    let box = entities[entities.round.selectedBoxId]
+    let box = entities[entities.gamebar.round.selectedBoxId]
     if (box === undefined || box === null) {
         return entities
     }
 
     if (box.color === 'green' && box.velocityX === 0 && box.velocityY === 0) {
         box.color = 'black'
-        entities.round.selectedBoxId = null
+        entities.gamebar.round.selectedBoxId = null
     }
 
     if (box.velocityX !== 0) {
@@ -162,11 +150,11 @@ const BoxMovement = (entities, {touches, dispatch, screen, layout, time}) => {
     }
 
     if (box.distanceX <= 0) {
-        nextRound(entities)
+        nextMove(entities)
     }
 
     if (box.distanceY <= 0) {
-        nextRound(entities)
+        nextMove(entities)
     }
 
     return entities

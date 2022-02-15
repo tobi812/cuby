@@ -9,6 +9,8 @@ const maxHeight = Dimensions.get("screen").height
 const boxSize = (maxWidth) / columnCount - boxMargin * 2
 
 const Constants = {
+    movesPerRound: 10,
+    totalRounds: 10,
     maxWidth: maxWidth,
     maxHeight: maxHeight,
     boxMargin: boxMargin,
@@ -16,7 +18,7 @@ const Constants = {
     columnCount: columnCount,
     totalFields: columnCount * columnCount,
     boardPositionX: boxSize / 2 + 5,
-    boardPositionY: boxSize / 2 + 5
+    boardPositionY: boxSize / 2 + 100
 }
 
 export default Constants;
