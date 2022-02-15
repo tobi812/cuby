@@ -5,13 +5,32 @@ import App from "../App";
 
 const BoxMovement = (entities, {touches, dispatch, screen, layout, time}) => {
 
+    const nextRound = (entities) => {
+        let selectedBox = entities[entities.round.selectedBoxId]
+        selectedBox.velocityX = 0
+        selectedBox.velocityY = 0
+        selectedBox.distanceX = selectedBox.size[0] + Constants.boxMargin
+        selectedBox.distanceY = selectedBox.size[1] + Constants.boxMargin
+        selectedBox.color = 'black'
+
+        entities.round.number = entities.round.number + 1
+        entities.round.selectedBoxId = null
+
+        Object.values(entities).forEach(entity => {
+            if (entity.color !== undefined) {
+                entity.color = 'black'
+            }
+        })
+
+    } 
+    
     const getColumnNeighbor = (box, entities, move) => {
         let factor = 1
         if (move.delta.pageX < 0) {
             factor = -1
         }
 
-        let newPositionX = box.body.position.x + (box.size[0] + Constants.boxMargin) * Math.sign(move.delta.pageX)
+        let newPositionX = box.body.position.x + (box.size[0] / 2 + Constants.boxMargin) * Math.sign(move.delta.pageX)
 
         return findBox(newPositionX, box.body.position.y, entities)
     }
@@ -22,9 +41,9 @@ const BoxMovement = (entities, {touches, dispatch, screen, layout, time}) => {
             factor = -1
         }
 
-        let newPositionY = box.body.position.y + (box.size[1] + Constants.boxMargin) * Math.sign(move.delta.pageY)
+        let newPositionY = box.body.position.y + (box.size[1] / 2 + Constants.boxMargin) * Math.sign(move.delta.pageY)
 
-        return findBox(box.body.position.y, newPositionY, entities)
+        return findBox(box.body.position.x, newPositionY, entities)
     }
 
     const findBox = (x, y, entities) => {
@@ -57,8 +76,8 @@ const BoxMovement = (entities, {touches, dispatch, screen, layout, time}) => {
 
         let box = null
         let direction = null
-        if (entities.round.boxId) {
-            box = entities[entities.round.boxId]
+        if (entities.round.selectedBoxId) {
+            box = entities[entities.round.selectedBoxId]
             direction = box.velocityX ? 'x' : null
             direction = box.velocityY ? 'y' : direction
         } else {
@@ -67,25 +86,25 @@ const BoxMovement = (entities, {touches, dispatch, screen, layout, time}) => {
             if (box === undefined) {
                 return entities
             }
+            
             entities.round.selectedBoxId = box.boxId
+            box.color = 'green'
         }
-
-        box.color = 'green'
-
-        if (direction === 'x') {
+    
+        if (direction === 'x' && box.velocityX === 0) {
             let columnNeighbor = getColumnNeighbor(box, entities, move)
             if (!columnNeighbor) {
-                box.velocityX = 2 * Math.sign(deltaX)
+                box.velocityX = 3 * Math.sign(deltaX)
             } else {
                 columnNeighbor.color = 'red'
             }
         }
 
-        if (direction === 'y') {
+        if (direction === 'y' && box.velocityY === 0) {
             // Check if maxHeight is reached and for collision with other box.
             let rowNeighbor = getRowNeighbor(box, entities, move)
             if (!getRowNeighbor(box, entities, move)) {
-                box.velocityY = 2 * Math.sign(deltaY)
+                box.velocityY = 3 * Math.sign(deltaY)
             } else {
                 rowNeighbor.color = 'orange'
             }
@@ -119,6 +138,11 @@ const BoxMovement = (entities, {touches, dispatch, screen, layout, time}) => {
         return entities
     }
 
+    if (box.color === 'green' && box.velocityX === 0 && box.velocityY === 0) {
+        box.color = 'black'
+        entities.round.selectedBoxId = null
+    }
+
     if (box.velocityX !== 0) {
         let velocityX = box.velocityX
         box.distanceX = box.distanceX - Math.abs(box.velocityX)
@@ -138,17 +162,11 @@ const BoxMovement = (entities, {touches, dispatch, screen, layout, time}) => {
     }
 
     if (box.distanceX <= 0) {
-        box.distanceX = box.size[0] + Constants.boxMargin
-        box.velocityX = 0
-        box.color = 'black'
-        entities.round.direction = null
+        nextRound(entities)
     }
 
     if (box.distanceY <= 0) {
-        box.distanceY = box.size[1] + Constants.boxMargin
-        box.velocityY = 0
-        box.color = 'black'
-        entities.round.direction = null
+        nextRound(entities)
     }
 
     return entities
