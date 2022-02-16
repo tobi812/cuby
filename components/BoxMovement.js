@@ -13,7 +13,6 @@ const BoxMovement = (entities, {touches, dispatch, screen, layout, time}) => {
 
         entities.gamebar.round.moves = entities.gamebar.round.moves + 1
         entities.gamebar.round.selectedBoxId = null
-
         Object.values(entities).forEach(entity => {
             if (entity.boxId !== undefined) {
                 entity.color = 'black'

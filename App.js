@@ -8,7 +8,6 @@ import BoxMovement from "./components/BoxMovement";
 import GameBoard from "./components/GameBoard";
 import newRound from "./components/GameLogic";
 import GameBar from "./components/GameBar";
-import Ball from "./components/Ball";
 import BallMovement from "./components/BallMovement";
 
 const Physics = (entities, { time }) => {
@@ -58,10 +57,14 @@ export default class App extends Component {
   setupWorld = () => {
     let engine = Matter.Engine.create({ enableSleeping: false });
     let world = engine.world;
-    let floor = Matter.Bodies.rectangle(this.maxWidth / 2, this.maxHeight, this.maxWidth, this.floorHeight, { isStatic: true });
+    let floor = Matter.Bodies.rectangle(this.maxWidth / 2, this.maxHeight, this.maxWidth, this.floorHeight, {
+      isStatic: true,
+      label: 'floor'
+    });
 
     Matter.World.add(world, [floor]);
-    
+    Matter.Events.on(engine, 'collisionStart', this.ballDrop)
+
     let entities = {
       physics: {
         engine: engine,
@@ -112,9 +115,20 @@ export default class App extends Component {
     }
   }
 
+  ballDrop = (event) => {
+    var pairs = event.pairs
+    for (var i = 0; i < pairs.length; i++) {
+      var pair = pairs[i];
+      if (pair.bodyA.label === 'floor' || pair.bodyB.label === 'floor') {
+        this.engine.dispatch('new-round')
+      }
+    }
+  }
+
   render() {
     return (
       <GameEngine
+        ref={(ref) => { this.engine = ref; }}
         style={styles.container}
         systems={[Physics, BoxMovement, BallMovement]}
         entities={this.entities}

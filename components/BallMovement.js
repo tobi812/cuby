@@ -56,9 +56,10 @@ const BallMovement = (entities, {touches, dispatch, screen, layout, time}) => {
                 color: 'red',
                 renderer: Ball
             }
+
             let round = entities.gamebar.round
             round.activeBallIds = round.activeBallIds.filter(item => {
-                return item === ballId
+                return item !== ballId
             })
         }
 
@@ -66,7 +67,6 @@ const BallMovement = (entities, {touches, dispatch, screen, layout, time}) => {
             ball.body.position.y = ball.body.position.y + ball.velocityY
         }
     })
-
 
     return entities
 }

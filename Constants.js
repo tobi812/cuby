@@ -2,7 +2,6 @@ import {Dimensions} from "react-native";
 
 
 const columnCount = 8
-// const totalFields = columnCount * columnCount
 const boxMargin = 2
 const maxWidth = Dimensions.get("screen").width
 const maxHeight = Dimensions.get("screen").height
