@@ -6,7 +6,7 @@ import Matter from "matter-js";
 import Constants from "./Constants";
 import BoxMovement from "./components/BoxMovement";
 import GameBoard from "./components/GameBoard";
-import newRound from "./components/GameLogic";
+import { newRound } from "./components/GameLogic";
 import GameBar from "./components/GameBar";
 import BallMovement from "./components/BallMovement";
 

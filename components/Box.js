@@ -20,10 +20,17 @@ export default class Box extends Component {
                 top: y,
                 borderRadius: 2,
             },
+            text: {
+                color: "lightblue",
+                fontSize: 8
+            }
         }); 
 
         return (
-            <View style={styles.box}/>
+            <View style={styles.box}>
+                <Text style={styles.text}>x:{x}</Text>
+                <Text style={styles.text}>y:{y}</Text>
+            </View>
         )
     }
 }

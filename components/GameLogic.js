@@ -15,9 +15,9 @@ const newRound = (entities) => {
 
     let ballId = 'ball_' + entities.gamebar.round.number
     entities[ballId] = {
+        ballId: ballId,
         body: newBall,
         radius: radius,
-        size: [radius, radius],
         color: 'red',
         renderer: Ball
     }
@@ -26,4 +26,78 @@ const newRound = (entities) => {
     return entities
 }
 
-export default newRound
+const findEntity = (x, y, entities) => {
+    return Object.values(entities).find(entity => {
+        if (!isBox(entity) && !isBall(entity)) {
+            return false
+        }
+
+        let entityX = entity.body.position.x
+        let entityY = entity.body.position.y
+        let halfWidth =  entity.size ? (entity.size[0] / 2) : entity.radius
+        let halfHeight = entity.size ? (entity.size[1] / 2) : entity.radius
+
+        return entityX - halfWidth <= x && x <= entityX + halfWidth &&
+            entityY - halfHeight <= y && y <= entityY + halfHeight
+    })
+}
+
+const isBox = (entity) => {
+    return entity.boxId !== undefined
+}
+
+const isBall = (entity) => {
+    return entity.ballId !== undefined
+}
+
+const getRowNeighbor = (x, y, entities, delta) => {
+    let sign = Math.sign(delta)
+    let newPositionX = x + Constants.boxSize / 2 + (Constants.boxSize + Constants.boxMargin) * sign
+
+    return findEntity(newPositionX, y, entities)
+}
+
+const getColumnNeighbor = (x, y, entities, delta) => {
+    let sign = Math.sign(delta)
+    let newPositionY = y + Constants.boxSize / 2 + (Constants.boxSize + Constants.boxMargin) * sign
+
+    return findEntity(x, newPositionY, entities)
+}
+
+const hasReachedMinMaxWidth = (entity, delta) => {
+    let halfWidth = (entity.size[0]) + Constants.boxMargin
+    let positionX = entity.body.position.x
+    if (delta > 0) {
+        return positionX + halfWidth + delta >= Constants.maxWidth
+    }
+
+    if (delta < 0) {
+        return positionX - halfWidth + delta <= 0
+    }
+
+    return false
+}
+
+const hasReachedMinMaxHeight = (entity, delta) => {
+    let halfHeight = (entity.size[1]) + Constants.boxMargin
+    let positionY = entity.body.position.y
+    if (delta > 0) {
+        return positionY + halfHeight + delta >= Constants.maxHeight
+    }
+
+    if (delta < 0) {
+        return positionY - halfHeight + delta <= 0
+    }
+
+    return false
+}
+
+export {
+    findEntity,
+    newRound,
+    getRowNeighbor,
+    getColumnNeighbor,
+    hasReachedMinMaxWidth,
+    hasReachedMinMaxHeight,
+    isBox
+}

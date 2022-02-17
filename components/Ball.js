@@ -1,5 +1,5 @@
 import React, {Component} from "react";
-import {StyleSheet, View} from "react-native";
+import {StyleSheet, Text, View} from "react-native";
 
 export default class Ball extends Component {
     render() {
@@ -13,15 +13,20 @@ export default class Ball extends Component {
                 backgroundColor: this.props.color,
                 width: body.circleRadius * 2,
                 height: body.circleRadius * 2,
-                borderRadius: body.circleRadius
-                , 
+                borderRadius: body.circleRadius,
                 left: x,
                 top: y,
             },
+            text: {
+                fontSize: 8
+            }
         });
 
         return (
-            <View style={styles.ball}/>
+            <View style={styles.ball}>
+                <Text style={styles.text}>x:{x}</Text>
+                <Text style={styles.text}>y:{y}</Text>
+            </View>
         )
     }
 }
