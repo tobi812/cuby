@@ -8,8 +8,8 @@ const newRound = (entities) => {
     round.number = round.number + 1
     round.moves = 0
 
-    let newBallX = Constants.boxMargin + 5 + (Constants.boxSize + Constants.boxMargin) * Math.floor(Math.random() * Constants.columnCount) + radius
-    let newBallY = Constants.boardPositionY - 2 * (Constants.boxSize + Constants.boxMargin)
+    let newBallX = Constants.boxMargin + 5 + (Constants.fieldSize) * Math.floor(Math.random() * Constants.columnCount) + radius
+    let newBallY = Constants.boardPositionY - 2 * (Constants.fieldSize)
     let newBall = Matter.Bodies.circle(newBallX, newBallY, radius, { isStatic: true })
     Matter.World.add(entities.physics.world, newBall);
 
@@ -18,6 +18,8 @@ const newRound = (entities) => {
         ballId: ballId,
         body: newBall,
         radius: radius,
+        velocityY: 0,
+        distanceY: Constants.fieldSize,
         color: 'red',
         renderer: Ball
     }
@@ -34,8 +36,8 @@ const findEntity = (x, y, entities) => {
 
         let entityX = entity.body.position.x
         let entityY = entity.body.position.y
-        let halfWidth =  entity.size ? (entity.size[0] / 2) : entity.radius
-        let halfHeight = entity.size ? (entity.size[1] / 2) : entity.radius
+        let halfWidth =  entity.size ? (entity.size[0] / 2) : entity.radius + Constants.boxMargin
+        let halfHeight = entity.size ? (entity.size[1] / 2) : entity.radius + Constants.boxMargin
 
         return entityX - halfWidth <= x && x <= entityX + halfWidth &&
             entityY - halfHeight <= y && y <= entityY + halfHeight
@@ -52,41 +54,39 @@ const isBall = (entity) => {
 
 const getRowNeighbor = (x, y, entities, delta) => {
     let sign = Math.sign(delta)
-    let newPositionX = x + Constants.boxSize / 2 + (Constants.boxSize + Constants.boxMargin) * sign
+    let newPositionX = x + Constants.boxSize / 2 + Constants.fieldSize * sign
 
     return findEntity(newPositionX, y, entities)
 }
 
 const getColumnNeighbor = (x, y, entities, delta) => {
     let sign = Math.sign(delta)
-    let newPositionY = y + Constants.boxSize / 2 + (Constants.boxSize + Constants.boxMargin) * sign
+    let newPositionY = y + Constants.boxSize / 2 + Constants.fieldSize * sign
 
     return findEntity(x, newPositionY, entities)
 }
 
 const hasReachedMinMaxWidth = (entity, delta) => {
-    let halfWidth = (entity.size[0]) + Constants.boxMargin
     let positionX = entity.body.position.x
     if (delta > 0) {
-        return positionX + halfWidth + delta >= Constants.maxWidth
+        return positionX + Constants.fieldSize + delta >= Constants.maxWidth
     }
 
     if (delta < 0) {
-        return positionX - halfWidth + delta <= 0
+        return positionX - Constants.fieldSize + delta <= 0
     }
 
     return false
 }
 
 const hasReachedMinMaxHeight = (entity, delta) => {
-    let halfHeight = (entity.size[1]) + Constants.boxMargin
     let positionY = entity.body.position.y
     if (delta > 0) {
-        return positionY + halfHeight + delta >= Constants.maxHeight
+        return positionY + Constants.fieldSize + delta >= Constants.maxHeight
     }
 
     if (delta < 0) {
-        return positionY - halfHeight + delta <= 0
+        return positionY - Constants.fieldSize + delta <= 0
     }
 
     return false

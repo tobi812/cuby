@@ -15,6 +15,7 @@ const Constants = {
     boxMargin: boxMargin,
     boxSize: boxSize,
     columnCount: columnCount,
+    fieldSize: boxSize + boxMargin,
     totalFields: columnCount * columnCount,
     boardPositionX: boxSize / 2 + 5,
     boardPositionY: boxSize / 2 + 100

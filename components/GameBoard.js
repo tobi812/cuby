@@ -10,6 +10,7 @@ const GameBoard = ({entities, world}) => {
     const boxSize = Constants.boxSize
     const boardPositionX = Constants.boardPositionX
     const boardPositionY = Constants.boardPositionY
+    const fieldSize = Constants.fieldSize
 
     const fieldTypes = [
         'black',
@@ -17,8 +18,8 @@ const GameBoard = ({entities, world}) => {
     ];
    
     for (let i = 0; i < totalFields; i++) {
-        let x = boardPositionX + (i % columnCount) * (boxSize + boxMargin);
-        let y = boardPositionY + Math.floor(i / columnCount) * (boxSize + boxMargin)
+        let x = boardPositionX + (i % columnCount) * (fieldSize);
+        let y = boardPositionY + Math.floor(i / columnCount) * (fieldSize)
         let randomType = fieldTypes[Math.floor(Math.random() * fieldTypes.length)];
         let box = Matter.Bodies.rectangle(x, y, boxSize, boxSize, { isStatic: true });
 
@@ -36,8 +37,8 @@ const GameBoard = ({entities, world}) => {
             color: randomType,
             velocityX: 0,
             velocityY: 0,
-            distanceX: boxSize + boxMargin,
-            distanceY: boxSize + boxMargin,
+            distanceX: fieldSize,
+            distanceY: fieldSize,
             renderer: Box
         }
     }

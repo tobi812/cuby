@@ -13,8 +13,8 @@ const BoxMovement = (entities, {touches, dispatch, screen, layout, time}) => {
         let selectedBox = entities[entities.gamebar.round.selectedBoxId]
         selectedBox.velocityX = 0
         selectedBox.velocityY = 0
-        selectedBox.distanceX = selectedBox.size[0] + Constants.boxMargin
-        selectedBox.distanceY = selectedBox.size[1] + Constants.boxMargin
+        selectedBox.distanceX = Constants.fieldSize
+        selectedBox.distanceY = Constants.fieldSize
         selectedBox.color = 'black'
 
         entities.gamebar.round.moves += 1
@@ -63,10 +63,6 @@ const BoxMovement = (entities, {touches, dispatch, screen, layout, time}) => {
 
         if (direction === 'y' && box.velocityY === 0 && !hasReachedMinMaxHeight(box, deltaY)) {
             let rowNeighbor = getColumnNeighbor(box.body.position.x, box.body.position.y, entities, deltaY)
-            console.log(box.body.position.x)
-            console.log(box.body.position.y)
-            console.log(deltaY)
-            console.log(box.body.position.y + Constants.boxSize / 2 + (Constants.boxSize + Constants.boxMargin) * Math.sign(deltaY))
             if (!rowNeighbor) {
                 box.velocityY = 10 * Math.sign(deltaY)
             } else {

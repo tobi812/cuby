@@ -13,6 +13,7 @@ const BallMovement = (entities, {touches, dispatch, screen, layout, time}) => {
             ball.velocityY = 3
         } else {
             ball.velocityY = 0
+            ball.distanceY = Constants.fieldSize
         }
 
         if (ball.body.position.y > Constants.maxHeight - 180 && ball.body.isStatic === true) {
@@ -37,7 +38,16 @@ const BallMovement = (entities, {touches, dispatch, screen, layout, time}) => {
         }
 
         if (ball.velocityY > 0) {
-            ball.body.position.y += ball.velocityY
+            let velocityY = ball.velocityY
+            ball.distanceY -= Math.abs(velocityY)
+            if (ball.distanceY < 0) {
+                velocityY += ball.distanceY * Math.sign(velocityY)
+            }
+            ball.body.position.y += velocityY
+        }
+
+        if (ball.distanceY <= 0) {
+            ball.distanceY = Constants.fieldSize
         }
     })
 
