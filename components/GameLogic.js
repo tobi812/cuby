@@ -30,7 +30,7 @@ const newRound = (entities) => {
 
 const findEntity = (x, y, entities) => {
     return Object.values(entities).find(entity => {
-        if (!isBox(entity) && !isBall(entity)) {
+        if (!isBox(entity) && !isBall(entity) && !isBlock(entity)) {
             return false
         }
 
@@ -38,6 +38,18 @@ const findEntity = (x, y, entities) => {
         let entityY = entity.body.position.y
         let halfWidth =  entity.size ? (entity.size[0] / 2) : entity.radius + Constants.boxMargin
         let halfHeight = entity.size ? (entity.size[1] / 2) : entity.radius + Constants.boxMargin
+        if (y < 150) {
+            console.log('START')
+            console.log(JSON.stringify({
+                x: ((Math.round(x * 100) / 100) .toString()),
+                lower: Math.round(((entityX - halfWidth) * 100) / 100) .toString(),
+                higher: Math.round(((entityX + halfWidth) * 100) / 100) .toString(),
+                y: ((Math.round(y * 100) / 100) .toString()),
+                lowerY: Math.round(((entityY - halfWidth) * 100) / 100) .toString(),
+                higherY: Math.round(((entityY + halfWidth) * 100) / 100) .toString()
+            }))
+            console.log('END')
+        }
 
         return entityX - halfWidth <= x && x <= entityX + halfWidth &&
             entityY - halfHeight <= y && y <= entityY + halfHeight
@@ -50,6 +62,10 @@ const isBox = (entity) => {
 
 const isBall = (entity) => {
     return entity.ballId !== undefined
+}
+
+const isBlock = (entity) => {
+    return entity.blockId !== undefined
 }
 
 const getRowNeighbor = (x, y, entities, delta) => {

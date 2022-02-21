@@ -92,7 +92,7 @@ export default class App extends Component {
     }
 
     entities = GameBoard({entities, world})
-    newRound(entities)
+    //newRound(entities)
 
     return entities
   }
