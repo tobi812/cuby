@@ -1,14 +1,15 @@
 import Constants from '../Constants'
 import Matter from 'matter-js'
 import Ball from './Ball'
-import {getColumnNeighbor} from './GameLogic'
+import {getBallNeighbor, getColumnNeighbor} from './GameLogic'
 
 const BallMovement = (entities, {touches, dispatch, screen, layout, time}) => {
     let activeBallIds = entities.gamebar.round.activeBallIds
 
     activeBallIds.forEach(ballId => {
         let ball = entities[ballId]
-        let rowNeighbor = getColumnNeighbor(ball.body.position.x, ball.body.position.y - Constants.boxSize, entities, 1)
+        let rowNeighbor = getBallNeighbor(ball, entities, 0, 1)
+
         if (rowNeighbor === undefined && ball.body.isStatic === true) {
             ball.velocityY = 3
         } else {

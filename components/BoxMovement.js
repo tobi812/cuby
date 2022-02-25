@@ -10,7 +10,7 @@ import {
 
 const BoxMovement = (entities, {touches, dispatch, screen, layout, time}) => {
     const nextMove = (entities) => {
-        let selectedBox = entities[entities.gamebar.round.selectedBoxId]
+        let selectedBox = entities[entities.gamebar.round.selectedEntityId]
         selectedBox.velocityX = 0
         selectedBox.velocityY = 0
         selectedBox.distanceX = Constants.fieldSize
@@ -18,7 +18,7 @@ const BoxMovement = (entities, {touches, dispatch, screen, layout, time}) => {
         selectedBox.color = 'black'
 
         entities.gamebar.round.moves += 1
-        entities.gamebar.round.selectedBoxId = null
+        entities.gamebar.round.selectedEntityId = null
         Object.values(entities).forEach(entity => {
             if (entity.boxId !== undefined) {
                 entity.color = 'black'
@@ -37,8 +37,8 @@ const BoxMovement = (entities, {touches, dispatch, screen, layout, time}) => {
         let deltaY = move.delta.pageY
         let box, direction
 
-        if (entities.gamebar.round.selectedBoxId) {
-            box = entities[entities.gamebar.round.selectedBoxId]
+        if (entities.gamebar.round.selectedEntityId) {
+            box = entities[entities.gamebar.round.selectedEntityId]
             direction = box.velocityX ? 'x' : null
             direction = box.velocityY ? 'y' : direction
         } else {
@@ -48,7 +48,7 @@ const BoxMovement = (entities, {touches, dispatch, screen, layout, time}) => {
                 return entities
             }
 
-            entities.gamebar.round.selectedBoxId = box.boxId
+            entities.gamebar.round.selectedEntityId = box.boxId
             box.color = 'green'
         }
 
@@ -79,14 +79,14 @@ const BoxMovement = (entities, {touches, dispatch, screen, layout, time}) => {
         }
     });
 
-    let box = entities[entities.gamebar.round.selectedBoxId]
+    let box = entities[entities.gamebar.round.selectedEntityId]
     if (box === undefined || box === null) {
         return entities
     }
 
     if (box.color === 'green' && box.velocityX === 0 && box.velocityY === 0) {
         box.color = 'black'
-        entities.gamebar.round.selectedBoxId = null
+        entities.gamebar.round.selectedEntityId = null
     }
 
     if (box.velocityX !== 0) {

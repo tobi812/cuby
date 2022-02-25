@@ -4,11 +4,11 @@ import { GameEngine } from "react-native-game-engine";
 import Box from './components/Box';
 import Matter from "matter-js";
 import Constants from "./Constants";
-import BoxMovement from "./components/BoxMovement";
 import GameBoard from "./components/GameBoard";
 import { newRound } from "./components/GameLogic";
 import GameBar from "./components/GameBar";
 import BallMovement from "./components/BallMovement";
+import BlockMovement from "./components/BlockMovement";
 
 const Physics = (entities, { time }) => {
   let engine = entities['physics'].engine;
@@ -84,7 +84,7 @@ export default class App extends Component {
         round: {
           number: 0,
           moves: 0,
-          selectedBoxId: null,
+          selectedEntityId: null,
           activeBallIds: []
         },
         renderer: GameBar
@@ -92,7 +92,7 @@ export default class App extends Component {
     }
 
     entities = GameBoard({entities, world})
-    //newRound(entities)
+    newRound(entities)
 
     return entities
   }
@@ -130,7 +130,7 @@ export default class App extends Component {
       <GameEngine
         ref={(ref) => { this.engine = ref; }}
         style={styles.container}
-        systems={[Physics, BoxMovement, BallMovement]}
+        systems={[Physics, BlockMovement, BallMovement]}
         entities={this.entities}
         onEvent={this.onEvent}>
          <StatusBar hidden={true} />

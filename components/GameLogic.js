@@ -28,31 +28,38 @@ const newRound = (entities) => {
     return entities
 }
 
-const findEntity = (x, y, entities) => {
+const findEntity = (x, y, entities, centerField = false) => {
     return Object.values(entities).find(entity => {
         if (!isBox(entity) && !isBall(entity) && !isBlock(entity)) {
             return false
         }
 
-        let entityX = entity.body.position.x
-        let entityY = entity.body.position.y
+        let fieldMiddleX = centerField ? getFieldMiddleX(x) : x
+        let fieldMiddleY = centerField ? getFieldMiddleY(y) : y
+
         let halfWidth =  entity.size ? (entity.size[0] / 2) : entity.radius + Constants.boxMargin
         let halfHeight = entity.size ? (entity.size[1] / 2) : entity.radius + Constants.boxMargin
-        if (y < 150) {
-            console.log('START')
-            console.log(JSON.stringify({
-                x: ((Math.round(x * 100) / 100) .toString()),
-                lower: Math.round(((entityX - halfWidth) * 100) / 100) .toString(),
-                higher: Math.round(((entityX + halfWidth) * 100) / 100) .toString(),
-                y: ((Math.round(y * 100) / 100) .toString()),
-                lowerY: Math.round(((entityY - halfWidth) * 100) / 100) .toString(),
-                higherY: Math.round(((entityY + halfWidth) * 100) / 100) .toString()
-            }))
-            console.log('END')
-        }
 
-        return entityX - halfWidth <= x && x <= entityX + halfWidth &&
-            entityY - halfHeight <= y && y <= entityY + halfHeight
+        let entityX = entity.body.position.x
+        let entityY = entity.body.position.y
+
+        // console.log(JSON.stringify({
+        //     x: ((Math.round(x * 100) / 100) .toString()),
+        //     y: ((Math.round(y * 100) / 100) .toString()),
+        //     fieldMiddleX: ((Math.round(fieldMiddleX * 100) / 100) .toString()),
+        //     fieldMiddleY: ((Math.round(fieldMiddleY * 100) / 100) .toString()),
+        //     entityX: entityX,
+        //     entityY: entityY,
+        //     lower: Math.round(((entityX - halfWidth) * 100) / 100) .toString(),
+        //     higher: Math.round(((entityX + halfWidth) * 100) / 100) .toString(),
+        //     lowerY: Math.round(((entityY - halfHeight) * 100) / 100) .toString(),
+        //     higherY: Math.round(((entityY + halfHeight) * 100) / 100) .toString(),
+        //     check: (entityX - halfWidth <= fieldMiddleX && fieldMiddleX <= entityX + halfWidth &&
+        //         entityY - halfHeight <= fieldMiddleY && fieldMiddleY <= entityY + halfHeight)
+        // }, null,'\t'))
+
+        return entityX - halfWidth <= fieldMiddleX && fieldMiddleX <= entityX + halfWidth &&
+            entityY - halfHeight <= fieldMiddleY && fieldMiddleY <= entityY + halfHeight
     })
 }
 
@@ -65,7 +72,7 @@ const isBall = (entity) => {
 }
 
 const isBlock = (entity) => {
-    return entity.blockId !== undefined
+    return entity !== undefined && entity.blockId !== undefined
 }
 
 const getRowNeighbor = (x, y, entities, delta) => {
@@ -77,9 +84,48 @@ const getRowNeighbor = (x, y, entities, delta) => {
 
 const getColumnNeighbor = (x, y, entities, delta) => {
     let sign = Math.sign(delta)
-    let newPositionY = y + Constants.boxSize / 2 + Constants.fieldSize * sign
+    let newPositionY = y + Constants.fieldSize / 2 + Constants.fieldSize * sign
 
     return findEntity(x, newPositionY, entities)
+}
+
+const getBlockNeighbor = (block, entities, deltaX = 0, deltaY = 0) => {
+    let signX = Math.sign(deltaX)
+    let signY = Math.sign(deltaY)
+    let x = block.body.position.x + signX * (block.size[0] / 2 + Constants.fieldSize / 2)
+    let y = block.body.position.y + signY * (block.size[1] / 2 + Constants.fieldSize / 2)
+
+    return findEntity(x, y, entities)
+}
+
+const getBallNeighbor = (ball, entities, deltaX = 0, deltaY = 0) => {
+    let signX = Math.sign(deltaX)
+    let signY = Math.sign(deltaY)
+    // console.log('x:' + ball.body.position.x)
+    // console.log('y:' + ball.body.position.y)
+    let x = ball.body.position.x + signX * (ball.radius + 2 * Constants.boxMargin) + deltaX
+    let y = ball.body.position.y + signY * (ball.radius + 2 * Constants.boxMargin) + deltaY
+    // console.log('x1:' + x)
+    // console.log('y2:' + y)
+    // console.log('xF:' + getFieldMiddleX(x))
+    // console.log('yF:' + getFieldMiddleY(y))
+
+    return findEntity(x, y, entities)
+}
+
+const getFieldMiddleX = (x) => {
+    let column = Math.floor((x - Constants.boardPositionX) / Constants.fieldSize)
+    let fieldMiddleX = Constants.boardPositionX + column * Constants.fieldSize + Constants.fieldSize / 2
+
+    return fieldMiddleX
+}
+
+const getFieldMiddleY = (y) => {
+    let fieldMiddleY
+    let row = Math.floor((y - Constants.boardPositionY) / Constants.fieldSize)
+    fieldMiddleY = Constants.boardPositionY + row * Constants.fieldSize + Constants.fieldSize / 2
+
+    return fieldMiddleY
 }
 
 const hasReachedMinMaxWidth = (entity, delta) => {
@@ -115,5 +161,8 @@ export {
     getColumnNeighbor,
     hasReachedMinMaxWidth,
     hasReachedMinMaxHeight,
-    isBox
+    isBox,
+    isBlock,
+    getBlockNeighbor,
+    getBallNeighbor
 }

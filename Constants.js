@@ -2,7 +2,7 @@ import {Dimensions} from "react-native";
 
 
 const columnCount = 8
-const boxMargin = 2
+const boxMargin = 5
 const maxWidth = Dimensions.get("screen").width
 const maxHeight = Dimensions.get("screen").height
 const boxSize = (maxWidth) / columnCount - boxMargin * 2
@@ -17,8 +17,10 @@ const Constants = {
     columnCount: columnCount,
     fieldSize: boxSize + boxMargin,
     totalFields: columnCount * columnCount,
-    boardPositionX: boxSize / 2 + 5,
-    boardPositionY: boxSize / 2 + 100
+    // boardPositionX: boxSize / 2 + 0,
+    // boardPositionY: boxSize / 2 + 100
+    boardPositionX: 5,
+    boardPositionY: 100
 }
 
 export default Constants;
